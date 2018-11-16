@@ -8,6 +8,14 @@ favorites_list.favorites_page:
   options:
     no_cache: TRUE
 
+favorites_list.form_page:
+  path: '/form/favorites'
+  defaults:
+    _form: '\Drupal\favorites_list\Form\FormPage'
+    _title: 'Page of Form'
+  requirements:
+    _permission: 'access favorite page'
+
 favorites_list.delete_form:
   path: '/user/favorites/{nid}/remove'
   defaults:
