@@ -16,7 +16,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class FavoritesListForm extends FormBase {
 
   /**
-   * @var MyPlaylistHelper $playlist_helper.
+   * The Playlist helper Class
+   *
+   * @var Drupal\favorites_list\services\MyPlaylistHelper $playlist_helper.
    */
 
   protected $playlist_helper;
@@ -37,8 +39,9 @@ class FavoritesListForm extends FormBase {
 
   public static function create(ContainerInterface $container) {
 
-    $playlist_helper = $container->get('favorites.helper');
-    return new static($playlist_helper);
+    return new static(
+        $container->get('favorites.helper')
+    );
 
   }
 
@@ -218,7 +221,6 @@ class FavoritesListForm extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
 
-
     /**
      * get the field value of form.
      */
@@ -229,9 +231,9 @@ class FavoritesListForm extends FormBase {
      * call to method saveSerie() of service favorites.helper.
      */
 
-    $this->playlist_helper->saveSerie($nids);
+    $example = $this->playlist_helper->saveSerie($nids);
 
-    // $message = \Drupal::Messenger()->addMessage(t('@result series has been added to the list!.' , ['@result' => implode(', ', $data_nodes)]));
+    $this->Messenger()->addMessage(t('@result series has been added to the list!.' , ['@result' => implode(', ', $example)]));
 
 
 	}

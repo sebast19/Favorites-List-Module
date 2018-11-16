@@ -11,27 +11,35 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class MyPlaylistHelper {
 
 	/**
+	 *  Current User
 	 * @var Drupal\Core\Session\AccountInterface $account
 	 */
 
 	protected $account;
 
 	/**
+	 *  Database Connection
 	 * @var Drupal\Core\Database\Connection $connection
 	 */
 
 	protected $connection;
 
 	/**
+	 *  Entity Type Manager
 	 * @var Drupal\Core\Entity\EntityTypeManager $entity_type
 	 */
 
 	protected $entity_type;
 
 	/**
-	 * Method contruct
-	 * @return Drupal\Core\Session\AccountInterface $account
-	 * @return Drupal\Core\Database\Connection $connection
+	 * Class Construct
+	 *
+	 * @param Drupal\Core\Session\AccountInterface $account
+	 *  The Current user
+	 * @param Drupal\Core\Database\Connection $connection
+	 *  The Database Connection
+	 * @param Drupal\Core\Entity\EntityTypeManager $entity_type
+	 *  The Entity Type Manager
 	 */
 
 	public function __construct(AccountInterface $account , Connection $connection , EntityTypeManager $entity_type) {
@@ -43,26 +51,26 @@ class MyPlaylistHelper {
 	}
 
 	/**
-	 * Method Create from ContainerInterface
-	 * @return Services from DependencyInjection
+	 * Method create
+	 *
+	 * @param  Symfony\Component\DependencyInjection\ContainerInterface $container
 	 */
 
 	public function create(ContainerInterface $container) {
 
-		$account = $container->get('current_user');
-		$connection = $container->get('database');
-		$entity_type = $container->get('entity_type.manager');
-
 		return new static(
-			$account, 
-			$connection, 
-			$entity_type
+			$container->get('current_user'),
+			$container->get('database'),
+			$container->get('entity_type.manager')
 		);
 
 	}
 
 	/**
-	 * @return array $titles of nodes, with a query
+	 * Main Method to save data in database
+	 *
+	 * @param array $nids the id's of the nodes to save in database
+	 * @return array $titles the titles of nodes saved, to show a message
 	 */
 
 	public function saveSerie($nids) {
@@ -80,7 +88,7 @@ class MyPlaylistHelper {
 		$nodes = $this->entity_type->getStorage('node')->loadMultiple($nids);
 
         foreach ($nodes as $node) {
-			
+
 			$this->connection->merge('favorites_playlist')
 				->key(['id' => NULL])
 				->fields([
@@ -89,20 +97,11 @@ class MyPlaylistHelper {
 				])
 				->execute();
 
-			$data_nodes = [
-
-				'id' => $node->id(),
-				'title' => $node->getTitle(),
-
-			];
+			$data_nodes[$node->id()] = $node->getTitle();
 
         }
 
-        //return $data_nodes;
-
-		// $message = \Drupal::Messenger()->addMessage(t('@result series has been added to the list!.' , ['@result' => implode(', ', $titles)]));
-
-		// return $message;
+        return $data_nodes;
 
 	}
 }
