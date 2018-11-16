@@ -1,0 +1,42 @@
+<?php
+
+/**
+ *
+ * Implements hook_schema()
+ */
+
+function favorites_list_schema() {
+  $schema['favorites_playlist'] = [
+    'description' => 'Table of favourites series of users.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Id of the register',
+      ],
+
+      'uid' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'description' => 'Field of foreign key of {users}.uid',
+      ],
+
+      'nid' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'description' => 'Field of foreign key of {nodes}.nid',
+      ],
+
+    ],
+
+    'primary key' => ['id'],
+    'indexes' => [
+      'uid' => ['uid'],
+      'nid' => ['nid'],
+    ],
+  ];
+
+  return $schema;
+}
