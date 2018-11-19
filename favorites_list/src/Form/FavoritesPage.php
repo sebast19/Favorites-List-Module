@@ -15,12 +15,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides route response from favorites_list module.
  */
 
+
 class FavoritesPage extends FormBase {
 
 	protected $account;
 	protected $connection;
 	protected $entity_type;
-	
+
 
 	public function __construct(AccountInterface $account, Connection $connection, EntityTypeManager $entity_type) {
 
@@ -51,7 +52,7 @@ class FavoritesPage extends FormBase {
 		$result = $this->connection->query('SELECT * FROM favorites_playlist WHERE uid = :uid', ['uid' => $uid])->fetchAll();
 
 		if (count($result) > 0) {
-			
+
 			foreach ($result as $field) {
 
 				$nids[] = $field->nid;
@@ -60,7 +61,7 @@ class FavoritesPage extends FormBase {
 
 			$entities = $this->entity_type
 					->getStorage('node')
-					->loadByProperties(['nid' => $nids , 'status' => 1]);	
+					->loadByProperties(['nid' => $nids , 'status' => 1]);
 
 			foreach ($entities as $entity) {
 
@@ -76,11 +77,11 @@ class FavoritesPage extends FormBase {
 
 			return $data;
 
-		}		
-		
+		}
+
 	}
 
-	
+
 
 	/**
 	 * {@inheritdoc}
@@ -102,7 +103,7 @@ class FavoritesPage extends FormBase {
 
 		if (!empty($data)) {
 
-			for ($i = 0; $i < count($data['id']); $i++) { 
+			for ($i = 0; $i < count($data['id']); $i++) {
 
 				$options[$data['id'][$i] ] = [
 
@@ -111,7 +112,7 @@ class FavoritesPage extends FormBase {
 				];
 
 			}
-			
+
 		} else {
 
 			$options = [];
@@ -149,21 +150,21 @@ class FavoritesPage extends FormBase {
 		if (!empty($values)) {
 
 			$this->connection->delete('favorites_playlist')
-						 ->condition('nid', $values, 'IN')
-						 ->condition('uid', $this->account->id())
-						 ->execute();
+						 	 ->condition('nid', $values, 'IN')
+						  	 ->condition('uid', $this->account->id())
+						 	 ->execute();
 
 	    	$this->Messenger()->addMessage('The selected series has been remove from the list.');
-			
+
 		} else {
 
 			$this->Messenger()->addWarning('Please select the production to be deleted', MessengerInterface::TYPE_WARNING);
 
 		}
 
-		
+
 	}
 
-	
-	
+
+
 }
