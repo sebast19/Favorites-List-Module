@@ -8,6 +8,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Link;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 
@@ -15,13 +16,42 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides route response from favorites_list module.
  */
 
-
 class FavoritesPage extends FormBase {
 
+	/**	
+	 * The Account of current user
+	 * @var Drupal\Core\Session\AccountInterface $account
+	 */
+
 	protected $account;
+
+	/**
+	 * The Connection to database
+	 * @var Drupal\Core\Database\Connection $connection
+	 */
+
 	protected $connection;
+
+	/**
+	 * The Entity Type Manager
+	 * @var Drupal\Core\Entity\EntityTypeManager $entity_type
+	 */
+
 	protected $entity_type;
 
+
+	/**
+	 * Class Construct
+	 * 
+	 * @param Drupal\Core\Session\AccountInterface $account
+	 * 	The Service of current user
+	 * 
+	 * @param Drupal\Core\Database\Connection $connection 
+	 * 	The service of instance a database object
+	 * 
+	 * @param Drupal\Core\Entity\EntityTypeManager $entity_type
+	 * 	The service of Entity Type Manager
+	 */
 
 	public function __construct(AccountInterface $account, Connection $connection, EntityTypeManager $entity_type) {
 
@@ -30,6 +60,10 @@ class FavoritesPage extends FormBase {
 		$this->entity_type = $entity_type;
 
 	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 
 	public static function create(ContainerInterface $container) {
 
@@ -42,7 +76,8 @@ class FavoritesPage extends FormBase {
 	}
 
 	/**
-	 * @return array the id's and the titles of nodes loaded by current user.
+	 * @return array $data
+	 * 	The Array of id and title of each loaded production.
 	 */
 
 	protected function getData() {
@@ -66,7 +101,7 @@ class FavoritesPage extends FormBase {
 			foreach ($entities as $entity) {
 
 				$ids[] = $entity->id();
-				$titles[] = $entity->getTitle();
+				$titles[] = Link::fromTextAndUrl($entity->getTitle(), $entity->toUrl());
 
 				$data = [
 

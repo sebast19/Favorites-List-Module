@@ -26,161 +26,167 @@ class FavoritesListForm extends FormBase {
 
   /**
    * Class Construct.
+   * 
+   * @param Drupal\favorites_list\services\MyPlaylistHelper $playlist_helper
+   *  The service of MyPlaylistHelper
    */
 
-  public function __construct(MyPlaylistHelper $playlist_helper) {
+	public function __construct(MyPlaylistHelper $playlist_helper) {
 
-    $this->playlist_helper = $playlist_helper;
+		$this->playlist_helper = $playlist_helper;
 
-  }
+	}
 
   /**
    * {@inheritdoc}
    */
 
-  public static function create(ContainerInterface $container) {
+	public static function create(ContainerInterface $container) {
 
-    return new static(
-        $container->get('favorites.helper')
-    );
+		return new static(
+			$container->get('favorites.helper')
+		);
 
-  }
+	}
 
-
-  /**
+	/**
 	 * {@inheritdoc}
 	 */
+
 	public function getFormId() {
-    return 'favorites_list';
-  }
+
+    	return 'favorites_list';
+
+  	}
 
   /**
 	 * {@inheritdoc}
 	 */
+
 	public function buildForm(array $form, FormStateInterface $form_state) {
 
-        $field_nodes = $form_state->get('num_fields');
+		$field_nodes = $form_state->get('num_fields');
 
-        $form['#tree'] = TRUE;
+		$form['#tree'] = TRUE;
 
 		$form['series_fieldset'] = [
 
 			'#type' => 'fieldset',
 			'#title' => $this->t('Favorites'),
-            '#prefix' => '<div id="nodes-field-wrapper">',
-            '#suffix' => '</div>',
+			'#prefix' => '<div id="nodes-field-wrapper">',
+			'#suffix' => '</div>',
 
-        ];
+		];
 
-        if (empty($field_nodes)) {
+		if (empty($field_nodes)) {
 
-          $field_nodes = $form_state->set('num_fields' , 1);
+		$field_nodes = $form_state->set('num_fields' , 1);
 
-        }
+		}
 
-        if ($form_state->get('num_fields') > 0) {
+		if ($form_state->get('num_fields') > 0) {
 
-          $value = $form_state->get('num_fields');
+		$value = $form_state->get('num_fields');
 
-        } else {
+		} else {
 
-          $value = 1;
+		$value = 1;
 
-        }
+		}
 
-        for ($i = 0; $i < $value ; $i++) {
+		for ($i = 0; $i < $value ; $i++) {
 
-          $form['series_fieldset']['serie'][$i] = [
+		$form['series_fieldset']['serie'][$i] = [
 
-           '#type' => 'entity_autocomplete',
-           '#target_type' => 'node',
-           '#selection_settings' => [
-               'target_bundles' => ['produccion'],
-            ],
+		'#type' => 'entity_autocomplete',
+		'#target_type' => 'node',
+		'#selection_settings' => [
+			'target_bundles' => ['produccion'],
+			],
 
-           '#placeholder' => ('Write the serie...'),
+		'#placeholder' => ('Write the serie...'),
 
-          ];
+		];
 
-        }
+		}
 
-        $form['actions'] = [
+		$form['actions'] = [
 
-          '#type' => 'actions',
+		'#type' => 'actions',
 
-        ];
+		];
 
 
 		$form['series_fieldset']['actions']['add_serie'] = [
 
- 			'#type' => 'submit',
- 			'#value' => $this->t('+'),
-            '#submit' => ['::addOne'],
-            '#ajax' => [
-                'callback' => '::addMoreCallback',
-                'wrapper' => 'nodes-field-wrapper',
-            ],
+			'#type' => 'submit',
+			'#value' => $this->t('+'),
+			'#submit' => ['::addOne'],
+			'#ajax' => [
+				'callback' => '::addMoreCallback',
+				'wrapper' => 'nodes-field-wrapper',
+			],
 
- 		];
+		];
 
-        if ($value > 1) {
+		if ($value > 1) {
 
-          $form['series_fieldset']['actions']['remove_serie'] = [
+		$form['series_fieldset']['actions']['remove_serie'] = [
 
-            '#type' => 'submit',
-            '#value' => $this->t('-'),
-            '#submit' => ['::removeCallback'],
-            '#ajax' => [
-              'callback' => '::addMoreCallback',
-              'wrapper' => 'nodes-field-wrapper',
-            ],
+			'#type' => 'submit',
+			'#value' => $this->t('-'),
+			'#submit' => ['::removeCallback'],
+			'#ajax' => [
+			'callback' => '::addMoreCallback',
+			'wrapper' => 'nodes-field-wrapper',
+			],
 
-          ];
+		];
 
-        }
+		}
 
-        $form['series_fieldset']['actions']['separator'] = [
+		$form['series_fieldset']['actions']['separator'] = [
 
-            '#type' => 'markup',
-            '#markup' => '<hr>',
+			'#type' => 'markup',
+			'#markup' => '<hr>',
 
-        ];
+		];
 
-        $form_state->SetCached(FALSE);
+		$form_state->SetCached(FALSE);
 
-        $form['series_fieldset']['actions']['submit'] = [
+		$form['series_fieldset']['actions']['submit'] = [
 
-          '#type' => 'submit',
-          '#value' => t('Save'),
+		'#type' => 'submit',
+		'#value' => t('Save'),
 
-        ];
+		];
 
-        /**
-         * @RenderElement("link");
-         */
+		/**
+		 * @RenderElement("link");
+		 */
 
-        $form['series_fieldset']['actions']['link_favourites'] = [
-          '#type' => 'link',
-          '#title' => $this->t('&nbsp;&nbsp;&nbsp;<button class="btn btn-info">Favorites List</button>'),
-          '#url' => \Drupal\Core\Url::fromRoute('favorites_list.favorites_page'),
-        ];
+		$form['series_fieldset']['actions']['link_favourites'] = [
+		'#type' => 'link',
+		'#title' => $this->t('&nbsp;&nbsp;&nbsp;<button class="btn btn-info">Favorites List</button>'),
+		'#url' => \Drupal\Core\Url::fromRoute('favorites_list.favorites_page'),
+		];
 
 		return $form;
-  }
+	}
 
 
   /**
    * function to add one field to save new serie.
    */
 
-  public function addOne (array &$form, FormStateInterface $form_state) {
+	public function addOne (array &$form, FormStateInterface $form_state) {
 
-    $field_nodes = $form_state->get('num_fields');
-    $add_button = $field_nodes + 1;
-    $form_state->set('num_fields' , $add_button);
-    $form_state->setRebuild();
+		$field_nodes = $form_state->get('num_fields');
+		$add_button = $field_nodes + 1;
+		$form_state->set('num_fields' , $add_button);
+		$form_state->setRebuild();
 
-  }
+	}
 
 
   /**
@@ -188,12 +194,12 @@ class FavoritesListForm extends FormBase {
    * @return $form.
    */
 
-  public function addMoreCallback (array &$form, FormStateInterface $form_state) {
+	public function addMoreCallback (array &$form, FormStateInterface $form_state) {
 
-    $field_nodes = $form_state->get('num_fields');
-    return $form['series_fieldset'];
+		$field_nodes = $form_state->get('num_fields');
+		return $form['series_fieldset'];
 
-  }
+	}
 
   /**
    * ajax callback to remove one field of the fieldset form.
@@ -201,41 +207,43 @@ class FavoritesListForm extends FormBase {
    */
 
 
-  public function removeCallback (array &$form, FormStateInterface $form_state) {
+	public function removeCallback (array &$form, FormStateInterface $form_state) {
 
-    $field_nodes = $form_state->get('num_fields');
+		$field_nodes = $form_state->get('num_fields');
 
-    if ($field_nodes > 1) {
+		if ($field_nodes > 1) {
 
-      $remove_button = $field_nodes - 1;
-      $form_state->set('num_fields' , $remove_button);
+			$remove_button = $field_nodes - 1;
+			$form_state->set('num_fields' , $remove_button);
 
-    }
+		}
 
-    $form_state->setRebuild();
+		$form_state->setRebuild();
 
-  }
+	}
 
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  
+	public function submitForm(array &$form, FormStateInterface $form_state) {
 
-    /**
-     * get the field value of form.
-     */
+		/**
+		 * get the field value of form.
+		 */
 
-    $nids = $form_state->getValue(['series_fieldset' , 'serie']);
+		$nids = $form_state->getValue(['series_fieldset' , 'serie']);
 
-    /**
-     * call to method saveSerie() of service favorites.helper.
-     */
+		/**
+		 * call to method saveSerie() of service favorites.helper.
+		 */
 
-    $example = $this->playlist_helper->saveSerie($nids);
+		$example = $this->playlist_helper->saveSerie($nids);
 
-    $this->Messenger()->addMessage(t('@result series has been added to the list!.' , ['@result' => implode(', ', $example)]));
+		$this->Messenger()->addMessage(t('@result series has been added to the list!.' , ['@result' => implode(', ', $example)]));
 
 
 	}
+
 }
