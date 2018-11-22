@@ -11,6 +11,7 @@ use Drupal\favorites_list\services\MyPlaylistHelper;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Messenger\MessengerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 
@@ -96,23 +97,23 @@ class FavoritesListForm extends FormBase {
 
 		for ($i = 0; $i < $value ; $i++) {
 
-		$form['series_fieldset']['serie'][$i] = [
+			$form['series_fieldset']['serie'][$i] = [
 
-		'#type' => 'entity_autocomplete',
-		'#target_type' => 'node',
-		'#selection_settings' => [
-			'target_bundles' => ['produccion'],
-			],
+				'#type' => 'entity_autocomplete',
+				'#target_type' => 'node',
+				'#selection_settings' => [
+					'target_bundles' => ['produccion'],
+					],
 
-		'#placeholder' => ('Write the serie...'),
+				'#placeholder' => ('Write the serie...'),
 
-		];
+			];
 
 		}
 
 		$form['actions'] = [
 
-		'#type' => 'actions',
+			'#type' => 'actions',
 
 		];
 
@@ -131,17 +132,17 @@ class FavoritesListForm extends FormBase {
 
 		if ($value > 1) {
 
-		$form['series_fieldset']['actions']['remove_serie'] = [
+			$form['series_fieldset']['actions']['remove_serie'] = [
 
-			'#type' => 'submit',
-			'#value' => $this->t('-'),
-			'#submit' => ['::removeCallback'],
-			'#ajax' => [
-			'callback' => '::addMoreCallback',
-			'wrapper' => 'nodes-field-wrapper',
-			],
+				'#type' => 'submit',
+				'#value' => $this->t('-'),
+				'#submit' => ['::removeCallback'],
+				'#ajax' => [
+				'callback' => '::addMoreCallback',
+				'wrapper' => 'nodes-field-wrapper',
+				],
 
-		];
+			];
 
 		}
 
@@ -156,8 +157,8 @@ class FavoritesListForm extends FormBase {
 
 		$form['series_fieldset']['actions']['submit'] = [
 
-		'#type' => 'submit',
-		'#value' => t('Save'),
+			'#type' => 'submit',
+			'#value' => t('Save'),
 
 		];
 
@@ -166,9 +167,11 @@ class FavoritesListForm extends FormBase {
 		 */
 
 		$form['series_fieldset']['actions']['link_favourites'] = [
-		'#type' => 'link',
-		'#title' => $this->t('&nbsp;&nbsp;&nbsp;<button class="btn btn-info">Favorites List</button>'),
-		'#url' => \Drupal\Core\Url::fromRoute('favorites_list.favorites_page'),
+
+			'#type' => 'link',
+			'#title' => $this->t('&nbsp;&nbsp;&nbsp;<button class="btn btn-info">Favorites List</button>'),
+			'#url' => \Drupal\Core\Url::fromRoute('favorites_list.favorites_page'),
+
 		];
 
 		return $form;
@@ -230,7 +233,8 @@ class FavoritesListForm extends FormBase {
 	public function submitForm(array &$form, FormStateInterface $form_state) {
 
 		/**
-		 * get the field value of form.
+		 * @var array $nids
+		 * 	The array with the nids to load in the service, to execute the query
 		 */
 
 		$nids = $form_state->getValue(['series_fieldset' , 'serie']);
@@ -239,10 +243,24 @@ class FavoritesListForm extends FormBase {
 		 * call to method saveSerie() of service favorites.helper.
 		 */
 
-		$example = $this->playlist_helper->saveSerie($nids);
+		$titles = $this->playlist_helper->saveSerie($nids);
 
-		$this->Messenger()->addMessage(t('@result series has been added to the list!.' , ['@result' => implode(', ', $example)]));
+		if ($titles) {
+			
+			$this->Messenger()->addMessage(
 
+				t('The next series has been added to the list <br> <ul><li> ' . implode('</li><li>', $titles) . '</li></ul>')
+	
+			);
+
+		} else {
+
+			$this->Messenger()->addError(
+
+				t('Please write atleast one serie')
+
+			);
+		}
 
 	}
 

@@ -1,15 +1,8 @@
 favorites_list.favorites_page:
   path: '/user/favorites'
   defaults:
-    _form: '\Drupal\favorites_list\Form\FavoritesPage'
+    _form: '\Drupal\favorites_list\Form\FavoritesPageForm'
     _title: 'My Favorites Series'
   requirements:
     _permission: 'access favorite page'
 
-favorites_list.form_page:
-  path: '/form/favorites'
-  defaults:
-    _form: '\Drupal\favorites_list\Form\FormPage'
-    _title: 'Page of Form'
-  requirements:
-    _permission: 'access favorite page'

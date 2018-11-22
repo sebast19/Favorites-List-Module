@@ -56,7 +56,7 @@ class MyPlaylistHelper {
 	 * @param  Symfony\Component\DependencyInjection\ContainerInterface $container
 	 */
 
-	public function create(ContainerInterface $container) {
+	public static function create(ContainerInterface $container) {
 
 		return new static(
 			$container->get('current_user'),
@@ -69,11 +69,17 @@ class MyPlaylistHelper {
 	/**
 	 * Main Method to save data in database
 	 *
-	 * @param array $nids the id's of the nodes to save in database
-	 * @return array $titles the titles of nodes saved, to show a message
+	 * @param array $nids 
+	 * 	the id's of the nodes to save in database
+	 * 
+	 * @return array $titles 
+	 * 	the titles of nodes saved, to show a message
+	 * 
+	 * @return NULL
+	 * 	When the array nids if empty, return null
 	 */
 
-	public function saveSerie($nids) {
+	public function saveSerie(array $nids) {
 
 		/**
 		 * @var Drupal\Core\Session\AccountInterface $account->id()
@@ -85,23 +91,49 @@ class MyPlaylistHelper {
 		 * load the node(s) for get the title and execute the query to database
 		 */
 
-		$nodes = $this->entity_type->getStorage('node')->loadMultiple($nids);
+		$nids = array_filter($nids); 
 
-        foreach ($nodes as $node) {
+		if (!empty($nids)) {
 
-			$this->connection->merge('favorites_playlist')
-				->key(['id' => NULL])
-				->fields([
-					'uid' => $uid,
-					'nid' => $node->id(),
-				])
-				->execute();
+			$nodes = $this->entity_type->getStorage('node')->loadMultiple($nids);
 
-			$data_nodes[$node->id()] = $node->getTitle();
+			foreach ($nodes as $node) {
 
-        }
+				$this->connection->merge('favorites_playlist')
+					->key(['id' => NULL])
+					->fields([
+						'uid' => $uid,
+						'nid' => $node->id(),
+					])
+					->execute();
 
-        return $data_nodes;
+				$data_nodes[$node->id()] = $node->getTitle();
+
+			}
+
+			return $data_nodes;
+			
+		}
+
+	}
+
+	/**
+	 * Method to delete series form list of user
+	 * 
+	 * @param array $values
+	 * 	The values of series to delete
+	 * 
+	 * @param $uid
+	 * 	The uid of the current user 
+	 */
+
+	public function deleteSerie(array $values, $uid) {
+
+		$this->connection->delete('favorites_playlist')
+						->condition('nid', $values, 'IN')
+						->condition('uid', $uid)
+						->execute();
+							  			  
 
 	}
 }
