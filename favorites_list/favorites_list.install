@@ -6,27 +6,29 @@
  */
 
 function favorites_list_schema() {
-  $schema['favorites_playlist'] = [
+
+  $schema['favorites_list'] = [
+
     'description' => 'Table of favourites series of users.',
     'fields' => [
       'id' => [
         'type' => 'serial',
         'not null' => TRUE,
-        'description' => 'Id of the register',
+        'description' => 'Id of each register',
       ],
 
       'uid' => [
         'type' => 'int',
         'not null' => TRUE,
         'unsigned' => TRUE,
-        'description' => 'Field of foreign key of {users}.uid',
+        'description' => 'Id of current user',
       ],
 
       'nid' => [
         'type' => 'int',
         'not null' => TRUE,
         'unsigned' => TRUE,
-        'description' => 'Field of foreign key of {nodes}.nid',
+        'description' => 'Id of the node to save',
       ],
 
     ],
@@ -39,4 +41,5 @@ function favorites_list_schema() {
   ];
 
   return $schema;
+
 }

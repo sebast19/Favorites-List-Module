@@ -1,4 +1,4 @@
 services:
-  favorites.helper:
+  favorites_list.helper:
     class: Drupal\favorites_list\services\MyPlaylistHelper
     arguments: ['@current_user' , '@database' , '@entity_type.manager']  

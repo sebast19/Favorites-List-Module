@@ -6,7 +6,6 @@ use Drupal\User\Entity\User;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class MyPlaylistHelper {
 
@@ -51,22 +50,6 @@ class MyPlaylistHelper {
 	}
 
 	/**
-	 * Method create
-	 *
-	 * @param  Symfony\Component\DependencyInjection\ContainerInterface $container
-	 */
-
-	public static function create(ContainerInterface $container) {
-
-		return new static(
-			$container->get('current_user'),
-			$container->get('database'),
-			$container->get('entity_type.manager')
-		);
-
-	}
-
-	/**
 	 * Main Method to save data in database
 	 *
 	 * @param array $nids 
@@ -82,12 +65,6 @@ class MyPlaylistHelper {
 	public function saveSerie(array $nids) {
 
 		/**
-		 * @var Drupal\Core\Session\AccountInterface $account->id()
-		 */
-
-		$uid = $this->account->id();
-
-		/**
 		 * load the node(s) for get the title and execute the query to database
 		 */
 
@@ -99,10 +76,10 @@ class MyPlaylistHelper {
 
 			foreach ($nodes as $node) {
 
-				$this->connection->merge('favorites_playlist')
+				$this->connection->merge('favorites_list')
 					->key(['id' => NULL])
 					->fields([
-						'uid' => $uid,
+						'uid' => $this->account->id(),
 						'nid' => $node->id(),
 					])
 					->execute();
@@ -114,6 +91,8 @@ class MyPlaylistHelper {
 			return $data_nodes;
 			
 		}
+
+		return NULL;
 
 	}
 
@@ -129,10 +108,10 @@ class MyPlaylistHelper {
 
 	public function deleteSerie(array $values, $uid) {
 
-		$this->connection->delete('favorites_playlist')
-						->condition('nid', $values, 'IN')
-						->condition('uid', $uid)
-						->execute();
+		$this->connection->delete('favorites_list')
+			->condition('nid', $values, 'IN')
+			->condition('uid', $uid)
+			->execute();
 							  			  
 
 	}

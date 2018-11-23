@@ -12,7 +12,6 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Messenger\MessengerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 
 class FavoritesListForm extends FormBase {
@@ -35,18 +34,6 @@ class FavoritesListForm extends FormBase {
 	public function __construct(MyPlaylistHelper $playlist_helper) {
 
 		$this->playlist_helper = $playlist_helper;
-
-	}
-
-  /**
-   * {@inheritdoc}
-   */
-
-	public static function create(ContainerInterface $container) {
-
-		return new static(
-			$container->get('favorites.helper')
-		);
 
 	}
 

@@ -10,7 +10,6 @@ use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\favorites_list\services\MyPlaylistHelper;
 use Drupal\Core\Link;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 
 /**
@@ -73,21 +72,6 @@ class FavoritesPageForm extends FormBase {
 	}
 
 	/**
-	 * {@inheritdoc}
-	 */
-
-	public static function create(ContainerInterface $container) {
-
-		return new static(
-			$container->get('current_user'),
-			$container->get('database'),
-			$container->get('entity_type.manager'),
-			$container->get('favorites.helper')
-		);
-
-	}
-
-	/**
 	 * @return array $data
 	 * 	The Array of id and title of each loaded production.
 	 */
@@ -96,7 +80,7 @@ class FavoritesPageForm extends FormBase {
 
 		$uid = $this->account->id();
 
-		$result = $this->connection->query('SELECT * FROM favorites_playlist WHERE uid = :uid', ['uid' => $uid])->fetchAll();
+		$result = $this->connection->query('SELECT * FROM favorites_list WHERE uid = :uid', ['uid' => $uid])->fetchAll();
 
 		if (count($result) > 0) {
 
